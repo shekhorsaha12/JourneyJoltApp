@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+    frontend:
+        build: ./react-front-end
+        ports:
+            - "3000:3000"
+        depends_on:
+            - backend
+
+    backend:
+        build: ./
+        ports:
+            - "8000:8080"
+        depends_on:
+            - postgres
+        volumes:
+            - "images:/usr/src/app/images/"
+
+    postgres:
+        image: postgres:14.1-alpine
+        restart: always
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+            - POSTGRES_DB=journey_jolt
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+
+volumes:
+    images:
+        driver: local
+    postgres-data:
+        driver: local
