@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
@@ -7,27 +7,44 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { API_URL } from "../constants";
 import Spinner from "react-bootstrap/Spinner";
+import { PaginationControl } from "react-bootstrap-pagination-control";
 
 const Places = () => {
     const [places, setPlaces] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
+    const [page, setPage] = useState(1);
+    const [totalCount, setTotalCount] = useState(1);
+
+    const pageSize = 2;
+
+    const location = useLocation();
 
     useEffect(() => {
-        axios.get(API_URL + "places/?q=" + searchQuery).then((res) => {
-            setPlaces(res.data);
-            setLoading(false);
-        });
-    }, [searchQuery]);
+        if (location.state?.q) {
+            setSearchQuery(location.state?.q);
+        }
+    }, []);
+
+    useEffect(() => {
+        axios
+            .get(API_URL + "places/?q=" + searchQuery + "&page=" + page)
+            .then((res) => {
+                setPlaces(res.data.results);
+                setTotalCount(res.data.count);
+                setLoading(false);
+            });
+    }, [searchQuery, page]);
 
     return (
         <div className="wrapper">
             <Sidebar />
             <div className="main">
                 <Header
-                    onSearchTextChanged={(searchText) =>
-                        setSearchQuery(searchText)
-                    }
+                    onSearchTextChanged={(searchText) => {
+                        setSearchQuery(searchText);
+                        setPage(1);
+                    }}
                 />
                 <main className="content">
                     <div className="container-fluid p-0">
@@ -147,6 +164,16 @@ const Places = () => {
                             </div>
                         </div>
                     </div>
+                    <>
+                        <PaginationControl
+                            page={page}
+                            between={4}
+                            total={totalCount}
+                            limit={pageSize}
+                            changePage={setPage}
+                            ellipsis={1}
+                        />
+                    </>
                 </main>
                 <Footer />
             </div>

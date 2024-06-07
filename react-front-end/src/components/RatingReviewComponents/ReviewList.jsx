@@ -86,7 +86,7 @@ const ReviewList = ({ placeId }) => {
             <textarea
                 value={reviewText}
                 onChange={(e) => setReviewText(e.target.value)}
-                placeholder="Some review about the place"
+                placeholder="Thoughts on this page?"
                 className="text-input"
                 required
             />

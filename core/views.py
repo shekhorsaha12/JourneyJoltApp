@@ -112,14 +112,27 @@ class PlaceView(APIView):
 
 class ListPlacesApiView(generics.ListAPIView):
     serializer_class = PlaceSerializer
+    pagination_class = MyModelPagination
 
     def get_queryset(self):
         queryset = Place.objects.filter(approved=True, is_featured=False).all()
         searchQuery = self.request.query_params.get('q', None)
-        print("searchQuery", searchQuery)
         if searchQuery is not None:
             queryset = queryset.filter(Q(name__icontains=searchQuery) | Q(title__icontains=searchQuery) | Q(description__icontains=searchQuery) | Q(city__icontains=searchQuery) )
         return queryset
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            'total': queryset.count(),
+            'results': serializer.data
+        })
 
 
 class ListFeaturedPlacesApiView(generics.ListAPIView):

@@ -8,6 +8,7 @@ import CreatePlace from "./views/create-place";
 import EditPlace from "./views/edit-place";
 import axios from "axios";
 import { AuthGuard } from "./components/AuthGuard";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 axios.interceptors.request.use(
     function (config) {

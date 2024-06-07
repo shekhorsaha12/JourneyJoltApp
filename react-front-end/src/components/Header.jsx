@@ -1,16 +1,44 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { API_URL } from "../constants";
 
 const Header = ({ onSearchTextChanged }) => {
     const [profile, setProfile] = useState(null);
+    const [searchText, setSearchText] = useState("");
+    const [autoFocus, setAutoFocus] = useState(false);
+    const [ready, setReady] = useState(false);
+
+    const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
+        debugger;
+        if (location.state?.q) {
+            if (!autoFocus) {
+                setAutoFocus(true);
+                setSearchText(location.state?.q);
+                onSearchTextChanged && onSearchTextChanged(location.state?.q);
+            } else {
+                setSearchText("");
+                setAutoFocus(false);
+                onSearchTextChanged && onSearchTextChanged("");
+            }
+        } else {
+            setSearchText("");
+            setAutoFocus(false);
+            onSearchTextChanged && onSearchTextChanged("");
+        }
+
         axios.get(API_URL + "profile/").then((res) => {
             setProfile(res.data.data);
         });
+        setReady(true);
     }, []);
+
+    if (!ready) {
+        return <div></div>;
+    }
 
     return (
         <nav className="navbar navbar-expand navbar-light navbar-bg">
@@ -24,12 +52,21 @@ const Header = ({ onSearchTextChanged }) => {
                     type="search"
                     placeholder="Search"
                     aria-label="Search"
-                    onChange={(e) =>
+                    value={searchText}
+                    autoFocus={autoFocus}
+                    onChange={(e) => {
+                        setSearchText(e.target.value);
                         onSearchTextChanged &&
-                        onSearchTextChanged(e.target.value)
-                    }
+                            onSearchTextChanged(e.target.value);
+                        if (location.pathname !== "/places/") {
+                            navigate("/places/", {
+                                state: {
+                                    q: e.target.value,
+                                },
+                            });
+                        }
+                    }}
                 />
-                {/* <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button> */}
             </form>
 
             <div className="navbar-collapse collapse">
