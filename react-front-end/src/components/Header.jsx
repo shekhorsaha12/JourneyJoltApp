@@ -13,7 +13,7 @@ const Header = ({ onSearchTextChanged }) => {
     const location = useLocation();
 
     useEffect(() => {
-        debugger;
+        // debugger;
         if (location.state?.q) {
             if (!autoFocus) {
                 setAutoFocus(true);

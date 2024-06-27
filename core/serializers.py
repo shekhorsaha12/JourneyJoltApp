@@ -96,10 +96,13 @@ class AddPlaceForm(forms.ModelForm):
     def save(self, user, commit=True):
         instance = super().save(commit=False)
         instance.created_by_user = user
-        lat, lon = WeatherMapHelper.getGeocoding(instance.city)
-        instance.temperature = WeatherMapHelper.getTemperature(lat, lon)
-        instance.lat = lat
-        instance.lon = lon
+        try:
+            lat, lon = WeatherMapHelper.getGeocoding(instance.city)
+            instance.temperature = WeatherMapHelper.getTemperature(lat, lon)
+            instance.lat = lat
+            instance.lon = lon
+        except:
+            pass
         if commit:
             instance.save()
         return instance
@@ -154,6 +157,6 @@ class PlaceSerializer(serializers.ModelSerializer):
         ]
 
 class MyModelPagination(PageNumberPagination):
-    page_size = 2
+    page_size = 3
     page_size_query_param = 'page_size'
     max_page_size = 100

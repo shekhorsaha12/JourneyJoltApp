@@ -27,6 +27,7 @@ const Login = () => {
             navigate("/places");
         } catch (error) {
             console.error("Error signing in:", error);
+            window.alert("Error user or password !!");
             // Handle login error here
         }
     };

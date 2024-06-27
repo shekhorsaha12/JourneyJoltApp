@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ReviewItem from "./ReviewItem";
 import "./ReviewList.css";
 import axios from "axios";
@@ -27,7 +27,7 @@ const ReviewList = ({ placeId }) => {
             return;
         }
         if (!reviewText || reviewText.trim().length === 0) {
-            alert("Please enter ome valid review details");
+            alert("Please enter valid review details");
             return;
         }
         const formData = new FormData();
@@ -35,7 +35,7 @@ const ReviewList = ({ placeId }) => {
         formData.append("review_text", reviewText);
         axios
             .post(API_URL + "places/" + placeId + "/reviews/add/", formData)
-            .then((res) => {
+            .then(() => {
                 setReloadCounter(reloadCounter + 1);
                 setRating(undefined);
                 setReviewText("");

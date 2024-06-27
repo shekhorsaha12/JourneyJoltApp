@@ -10,7 +10,10 @@ class WeatherMapHelper:
     
     rsp = requests.get(geo_url)
     if rsp.status_code == 200:
+      
       data = rsp.json()
+      if not data:
+        raise Exception("data is not there")
       lat = data[0]['lat']
       lon = data[0]['lon']
       return lat, lon

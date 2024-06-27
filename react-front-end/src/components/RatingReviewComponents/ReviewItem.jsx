@@ -1,4 +1,3 @@
-import React from "react";
 import "./ReviewItem.css";
 
 const ReviewItem = ({ review }) => {

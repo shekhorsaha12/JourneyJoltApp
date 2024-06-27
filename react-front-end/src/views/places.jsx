@@ -16,7 +16,7 @@ const Places = () => {
     const [page, setPage] = useState(1);
     const [totalCount, setTotalCount] = useState(1);
 
-    const pageSize = 2;
+    const pageSize = 3;
 
     const location = useLocation();
 
