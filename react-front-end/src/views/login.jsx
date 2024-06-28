@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { API_URL } from "../constants";
@@ -9,6 +9,18 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [passwordError, setPasswordError] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [rememberMe, setRememberMe] = useState(false);
+
+    useEffect(() => {
+        const savedEmail = localStorage.getItem("email");
+        const savedPassword = localStorage.getItem("password");
+
+        if (savedEmail && savedPassword) {
+            setEmail(savedEmail);
+            setPassword(savedPassword);
+            setRememberMe(true);
+        }
+    }, []);
 
     const onSubmitSignIn = async (e) => {
         e.preventDefault();
@@ -23,6 +35,14 @@ const Login = () => {
             const token = response.data.data.access_token;
             // Store the token in local storage for authentication
             localStorage.setItem("token", token);
+
+            if (rememberMe) {
+                localStorage.setItem("email", email);
+                localStorage.setItem("password", password);
+            } else {
+                localStorage.removeItem("email");
+                localStorage.removeItem("password");
+            }
 
             navigate("/places");
         } catch (error) {
@@ -45,6 +65,10 @@ const Login = () => {
         setPasswordError(""); // Clear any previous password error
     };
 
+    const handleRememberMeChange = (e) => {
+        setRememberMe(e.target.checked);
+    };
+
     return (
         <main className="d-flex w-100">
             <div className="container d-flex flex-column">
@@ -54,16 +78,13 @@ const Login = () => {
                             <div className="text-center mt-4">
                                 <h1 className="h2">Welcome back!</h1>
                                 <p className="lead">
-                                    {" "}
-                                    Sign in to your account to continue{" "}
+                                    Sign in to your account to continue
                                 </p>
                             </div>
                             <div className="card">
                                 <div className="card-body">
                                     <div className="m-sm-3">
-                                        <form
-                                            onSubmit={(e) => onSubmitSignIn(e)}
-                                        >
+                                        <form onSubmit={onSubmitSignIn}>
                                             <div className="mb-3">
                                                 <label className="form-label">
                                                     Email
@@ -123,7 +144,10 @@ const Login = () => {
                                                         className="form-check-input"
                                                         value="remember-me"
                                                         name="remember-me"
-                                                        defaultChecked
+                                                        checked={rememberMe}
+                                                        onChange={
+                                                            handleRememberMeChange
+                                                        }
                                                     />
                                                     <label
                                                         className="form-check-label text-small"
@@ -143,7 +167,6 @@ const Login = () => {
                                 </div>
                             </div>
                             <div className="text-center mb-3">
-                                {" "}
                                 Don't have an account?{" "}
                                 <Link to="/register">Sign up</Link>
                             </div>

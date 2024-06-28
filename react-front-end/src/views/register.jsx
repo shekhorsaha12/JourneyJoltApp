@@ -14,39 +14,86 @@ const Register = () => {
     const [lastNameError, setLastNameError] = useState("");
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
+    const [confirmPasswordError, setConfirmPasswordError] = useState("");
+
+    const validateName = (name) => {
+        if (name.trim() === "") {
+            return "Name cannot be empty";
+        }
+        if (name.trim().length < 2) {
+            return "Name must be at least 2 characters";
+        }
+        if (!/^[A-Za-z]+$/.test(name.trim())) {
+            return "Name can only contain letters";
+        }
+        return "";
+    };
+
+    const validateEmail = (email) => {
+        if (email.trim() === "") {
+            return "Email cannot be empty";
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email.trim())) {
+            return "Invalid email format";
+        }
+        return "";
+    };
+
+    const validatePassword = (password) => {
+        if (password.trim() === "") {
+            return "Password cannot be empty";
+        }
+        if (password.length < 8) {
+            return "Password must be at least 8 characters";
+        }
+        if (!/[A-Z]/.test(password)) {
+            return "Password must contain at least one uppercase letter";
+        }
+        if (!/[a-z]/.test(password)) {
+            return "Password must contain at least one lowercase letter";
+        }
+        if (!/[0-9]/.test(password)) {
+            return "Password must contain at least one number";
+        }
+        if (!/[#$]/.test(password)) {
+            return "Password can only contain special characters '#' or '$'";
+        }
+        return "";
+    };
 
     const onSubmitSignUp = async (e) => {
         e.preventDefault();
 
-        // Validation checks
-        if (firstName.trim() === "") {
-            setFirstNameError("First Name cannot be empty");
+        // Name validation
+        const firstNameValidationError = validateName(firstName);
+        if (firstNameValidationError) {
+            setFirstNameError(firstNameValidationError);
             return;
         }
 
-        if (lastName.trim() === "") {
-            setLastNameError("Last Name cannot be empty");
+        const lastNameValidationError = validateName(lastName);
+        if (lastNameValidationError) {
+            setLastNameError(lastNameValidationError);
             return;
         }
 
-        if (email.trim() === "") {
-            setEmailError("Email cannot be empty");
+        // Email validation
+        const emailValidationError = validateEmail(email);
+        if (emailValidationError) {
+            setEmailError(emailValidationError);
             return;
         }
 
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email.trim())) {
-            setEmailError("Invalid email format");
-            return;
-        }
-
-        if (password.trim() === "" || confirmPassword.trim() === "") {
-            alert("All fields must be filled");
+        // Password validation
+        const passwordValidationError = validatePassword(password);
+        if (passwordValidationError) {
+            setPasswordError(passwordValidationError);
             return;
         }
 
         if (password !== confirmPassword) {
-            alert("Passwords do not match");
+            setConfirmPasswordError("Passwords do not match");
             return;
         }
 
@@ -86,6 +133,7 @@ const Register = () => {
 
     const handleConfirmPasswordChange = (e) => {
         setConfirmPassword(e.target.value);
+        setConfirmPasswordError(""); // Clear any previous confirm password error
     };
 
     return (
@@ -101,9 +149,7 @@ const Register = () => {
                             <div className="card">
                                 <div className="card-body">
                                     <div className="m-sm-3">
-                                        <form
-                                            onSubmit={(e) => onSubmitSignUp(e)}
-                                        >
+                                        <form onSubmit={onSubmitSignUp}>
                                             <div className="mb-3">
                                                 <label className="form-label">
                                                     First Name
@@ -111,7 +157,7 @@ const Register = () => {
                                                 <input
                                                     className="form-control form-control-lg"
                                                     type="text"
-                                                    name="name"
+                                                    name="firstName"
                                                     placeholder="Enter your first name"
                                                     value={firstName}
                                                     onChange={
@@ -131,7 +177,7 @@ const Register = () => {
                                                 <input
                                                     className="form-control form-control-lg"
                                                     type="text"
-                                                    name="name"
+                                                    name="lastName"
                                                     placeholder="Enter your last name"
                                                     value={lastName}
                                                     onChange={
@@ -196,6 +242,11 @@ const Register = () => {
                                                         handleConfirmPasswordChange
                                                     }
                                                 />
+                                                {confirmPasswordError && (
+                                                    <div className="text-danger">
+                                                        {confirmPasswordError}
+                                                    </div>
+                                                )}
                                             </div>
 
                                             <div className="d-grid gap-2 mt-3">
